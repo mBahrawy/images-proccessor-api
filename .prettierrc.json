@@ -1,0 +1,21 @@
+{
+    "singleQuote": false,
+    "printWidth": 120,
+    "bracketSpacing": true,
+    "semi": true,
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "endOfLine": "auto",
+    "prettier/prettier": [
+        "error",
+        {
+            "endOfLine": "auto"
+        }
+    ],
+    "[typescript]": {
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true
+    },
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false
+}
