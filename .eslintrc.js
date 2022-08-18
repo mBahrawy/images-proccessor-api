@@ -18,7 +18,7 @@ module.exports = {
         "prettier/prettier": 1,
         "no-console": 1,
         "prefer-const": 1,
-        "max-len": [1, { code: 100, ignoreComments: true }],
+        "max-len": [1, { code: 140, ignoreComments: true }],
         "@typescript-eslint/no-explicit-any": 2,
         "no-var": 2
     }
