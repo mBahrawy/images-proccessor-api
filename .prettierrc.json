@@ -1,6 +1,6 @@
 {
     "singleQuote": false,
-    "printWidth": 120,
+    "printWidth": 100,
     "bracketSpacing": true,
     "semi": true,
     "trailingComma": "none",
@@ -11,11 +11,5 @@
         {
             "endOfLine": "auto"
         }
-    ],
-    "[typescript]": {
-        "editor.formatOnPaste": false,
-        "editor.formatOnSave": true
-    },
-    "editor.formatOnPaste": false,
-    "editor.formatOnSave": false
+    ]
 }

@@ -13,12 +13,13 @@ module.exports = {
     rules: {
         // 0:no effect,  1:warning, 2:error
         semi: ["error", "always"],
-        "@typescript-eslint/no-explicit-any": 2,
+        "no-trailing-spaces": 0,
+        "@typescript-eslint/ban-types": 0,
         "prettier/prettier": 1,
         "no-console": 1,
-        "no-var": 2,
         "prefer-const": 1,
-        "no-trailing-spaces": 0,
-        "@typescript-eslint/ban-types": 0
+        "max-len": [1, { code: 100, ignoreComments: true }],
+        "@typescript-eslint/no-explicit-any": 2,
+        "no-var": 2
     }
 };

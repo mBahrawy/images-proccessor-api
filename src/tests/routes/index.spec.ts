@@ -1,3 +1,15 @@
+import supertest from "supertest";
+import server from "../../server";
+
+const request = supertest(server);
+
+describe("Server started,", function () {
+    it("should start server home page", async function () {
+        const response = await request.get("/").set("Accept", "application/json");
+        expect(response.status).toEqual(200);
+    });
+});
+
 // import { getPost } from "../index";
 
 // it("should get post data with id=1", async () => {
