@@ -42,7 +42,7 @@ createPlaceholder.get("/", (req: Request, res: Response) => {
     const image = generateImageInfo(req);
     // Check if image is aready genrated for improving preformance
     if (isImageExsists(image)) {
-        res.sendFile(generateImageDirectory(image));
+        res.sendFile(generateImageDirectory("placeholders", image));
         return;
     }
     createImage(image).then((img: string | undefined): void => res.sendFile(img || ""));

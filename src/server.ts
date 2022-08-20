@@ -16,11 +16,13 @@ const app: Application = express();
 // HTTP request logger middleware
 app.use(morgan("dev"));
 
+// TODO Create needed iamges folders if doesnt exixsts
+app.use(express.static("public"));
+
 app.use("/", routes);
 
 // start express server
 app.listen(PORT, () => {
-    // eslint-disable-next-line
     console.log(`Server is starting at prot:${PORT}`);
 });
 

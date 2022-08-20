@@ -13,9 +13,8 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     };
 };
 
-export const generateImageDirectory = (image: PlaceholderImage): string => {
-    // eslint-disable-next-line
-    return `${__basedir}\\images\\placeholders\\img_${image.width}X${image.height}_${image.background}_${image.text}_${image.textcolor}.png`;
+export const generateImageDirectory = (parent: string ,image: PlaceholderImage): string => {
+    return `${__basedir}\\public\\images\\${parent}\\img_${image.width}X${image.height}_${image.background}_${image.text}_${image.textcolor}.png`;
 };
 
 export const createTextSVG = (width: number, height: number, text: string, textcolor: string) => {
@@ -31,9 +30,9 @@ export const createTextSVG = (width: number, height: number, text: string, textc
             `;
 };
 
-export const createImage = async (image: PlaceholderImage) => {
+export const createImage = async (image: PlaceholderImage): Promise<string | undefined> => {
     const svgBuffer = Buffer.from(createTextSVG(image.width, image.height, image.text, image.textcolor));
-    const imageFile = generateImageDirectory(image);
+    const imageFile = generateImageDirectory("placeholders", image);
     try {
         await sharp({
             create: {
@@ -48,22 +47,29 @@ export const createImage = async (image: PlaceholderImage) => {
             .toFile(imageFile);
         return imageFile;
     } catch (e) {
-        // eslint-disable-next-line
         console.log(e);
     }
 };
 
 export const isImageExsists = (image: PlaceholderImage): Boolean => {
-    const imageFile = generateImageDirectory(image);
+    const imageFile = generateImageDirectory("placeholders", image);
     try {
         if (fs.existsSync(imageFile)) {
             return true;
         }
     } catch (err) {
-        // eslint-disable-next-line
         console.error(err);
         return false;
     }
 
     return false;
 };
+
+// export const editedImage = (image: unknown) : Promise<string | undefined> => {
+//     try {
+//         return
+//     } catch (e) {
+//         console.log(e);
+        
+//     }
+// }
