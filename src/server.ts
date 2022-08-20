@@ -20,6 +20,7 @@ app.use("/", routes);
 
 // start express server
 app.listen(PORT, () => {
+    // eslint-disable-next-line
     console.log(`Server is starting at prot:${PORT}`);
 });
 
