@@ -1,7 +1,10 @@
 import sharp from "sharp";
-import { PlaceholderImage } from "./../interfaces/PlaceholderImage";
-import { Request } from "express";
 import * as fs from "fs";
+import { PlaceholderImage } from "./../interfaces/PlaceholderImage";
+import { genUniqueId } from "./id-generator";
+import { Request } from "express";
+import { createPlaceholderImagePath, createEditedImagePath } from "./path-utilities";
+import { Image } from "../interfaces/Image";
 
 export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     return {
@@ -11,10 +14,6 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
         ...(query?.textcolor ? { textcolor: `#${query.textcolor}` } : { textcolor: "#000000" }),
         ...(query?.background ? { background: `#${query.background}` } : { background: `#ffffff` })
     };
-};
-
-export const generateImageDirectory = (parent: string ,image: PlaceholderImage): string => {
-    return `${__basedir}\\public\\images\\${parent}\\img_${image.width}X${image.height}_${image.background}_${image.text}_${image.textcolor}.png`;
 };
 
 export const createTextSVG = (width: number, height: number, text: string, textcolor: string) => {
@@ -32,7 +31,7 @@ export const createTextSVG = (width: number, height: number, text: string, textc
 
 export const createImage = async (image: PlaceholderImage): Promise<string | undefined> => {
     const svgBuffer = Buffer.from(createTextSVG(image.width, image.height, image.text, image.textcolor));
-    const imageFile = generateImageDirectory("placeholders", image);
+    const imageFile = createPlaceholderImagePath(image);
     try {
         await sharp({
             create: {
@@ -52,7 +51,7 @@ export const createImage = async (image: PlaceholderImage): Promise<string | und
 };
 
 export const isImageExsists = (image: PlaceholderImage): Boolean => {
-    const imageFile = generateImageDirectory("placeholders", image);
+    const imageFile = createPlaceholderImagePath(image);
     try {
         if (fs.existsSync(imageFile)) {
             return true;
@@ -65,11 +64,19 @@ export const isImageExsists = (image: PlaceholderImage): Boolean => {
     return false;
 };
 
-// export const editedImage = (image: unknown) : Promise<string | undefined> => {
-//     try {
-//         return
-//     } catch (e) {
-//         console.log(e);
-        
-//     }
-// }
+export const editedImage = async (imageBuffer: Buffer, imageOptions: Image): Promise<string | undefined> => {
+    const imageFile = createEditedImagePath("image", genUniqueId());
+
+    try {
+        await sharp(imageBuffer)
+            .resize(imageOptions.width, imageOptions.height, {
+                fit: sharp.fit.inside,
+                withoutEnlargement: true
+            })
+            .toFile(imageFile);
+
+        return imageFile;
+    } catch (e) {
+        console.log(e);
+    }
+};

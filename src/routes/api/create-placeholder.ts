@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response, Router } from "express";
-import { createImage, generateImageInfo, isImageExsists, generateImageDirectory } from "../../utilities/images";
+import { createImage, generateImageInfo, isImageExsists } from "../../utilities/images";
+import { createPlaceholderImagePath } from "../../utilities/path-utilities";
 
 const createPlaceholder: Router = express.Router();
 
@@ -42,7 +43,7 @@ createPlaceholder.get("/", (req: Request, res: Response) => {
     const image = generateImageInfo(req);
     // Check if image is aready genrated for improving preformance
     if (isImageExsists(image)) {
-        res.sendFile(generateImageDirectory("placeholders", image));
+        res.sendFile(createPlaceholderImagePath(image));
         return;
     }
     createImage(image).then((img: string | undefined): void => res.sendFile(img || ""));

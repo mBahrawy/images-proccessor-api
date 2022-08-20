@@ -1,21 +1,20 @@
 import express, { Request, Response, Router } from "express";
-import editImage from "./api/edit-image";
 import createPlaceholder from "./api/create-placeholder";
+import editedImage from "./api/edit-image";
 import logger from "../utilities/logger";
+import path from "path";
 
 const routes: Router = express.Router();
 
 routes.get("/", logger, (req: Request, res: Response) => {
-    res.send(`
-        <h3>Hello to images proccessor API, Please choose an action to do:</h3>
-        <ul>
-            <li>go to <b>/create</b> to create an image placeholder</li>
-            <li>go to <b>/edit</b> to edit an image</li>
-        </ul>
-    `);
+    res.render(path.join("pages", "index.ejs"));
 });
 
-routes.use("/create", createPlaceholder);
-routes.use("/edit", editImage);
+// Backedend routes
+routes.use("/create/api", createPlaceholder);
+routes.use("/edit/api", editedImage);
+
+// Frontend routes
+routes.use("/edit", (req, res) => res.render(path.join("pages", "edit.ejs")));
 
 export default routes;

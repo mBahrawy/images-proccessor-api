@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('../partials/head'); %>
+</head>
+
+<body>
+
+  <main class="min-vh-100 d-flex flex-column">
+
+    <div class="container py-5 flex-grow-1 d-flex flex-column">
+
+      <div class="row justify-content-center flex-grow-1">
+        <div class="col-md-8">
+          <h4 class="text-center mb-5">Image editor online</h4>
+          <form method="post" enctype="multipart/form-data" action="edit/api">
+
+            <div class="row p-0">
+
+              <div class="col-sm-6 mb-3">
+                <label class="form-label">width</label>
+                <input type="number" class="form-control" name="width" placeholder="Put image width">
+              </div>
+
+              <div class="col-sm-6 mb-3">
+                <label class="form-label">height</label>
+                <input type="number" class="form-control" name="height" placeholder="Put image height">
+              </div>
+
+              <div class="col-sm-12 mb-3">
+                <label for="formFile" class="form-label">Select an image</label>
+                <input name="image" class="form-control" type="file" id="formFile">
+              </div>
+
+
+              <div class="col-sm-6 mb-3">
+                <button type="submit" class="btn btn-primary">Upload</button>
+              </div>
+
+
+
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+
+    </div>
+    <footer>
+      <%- include('../partials/footer'); %>
+    </footer>
+  </main>
+
+
+
+</body>
+
+</html>

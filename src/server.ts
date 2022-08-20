@@ -1,6 +1,8 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import routes from "./routes/index";
+import path from "path";
+import * as ejs from "ejs";
 import * as dotenv from "dotenv";
 
 // Defining app base folder
@@ -17,7 +19,15 @@ const app: Application = express();
 app.use(morgan("dev"));
 
 // TODO Create needed iamges folders if doesnt exixsts
-app.use(express.static("public"));
+// Require static assets from public folder
+app.use(express.static(path.join(__dirname, "public")));
+
+// Set 'views' directory for any views
+app.set("views", path.join(__dirname, "views"));
+
+// Set view engine as EJS
+app.engine("html", ejs.renderFile);
+app.set("view engine", "html");
 
 app.use("/", routes);
 
