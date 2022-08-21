@@ -6,16 +6,16 @@ const createPlaceholder: Router = express.Router();
 
 createPlaceholder.use((req: Request, res: Response, next: NextFunction) => {
     const colorRegex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
-    const errorsArray = [];
+    const errorsArray: string[] = [];
 
     if (req.query.width) {
         isNaN(Number(req.query.width)) && errorsArray.push("Please provide a valid width.");
-        Number(req.query.width) > 10000 && errorsArray.push("Image width is too large, max is 10000px.");
+        Number(req.query.width) > 20000 && errorsArray.push("Image width is too large, max is 20000px.");
     }
 
     if (req.query.height) {
         isNaN(Number(req.query.height)) && errorsArray.push("Please provide a valid height.");
-        Number(req.query.height) > 10000 && errorsArray.push("Image height is too large, max is 10000px.");
+        Number(req.query.height) > 20000 && errorsArray.push("Image height is too large, max is 20000px.");
     }
 
     if (req.query.text) {
@@ -32,7 +32,12 @@ createPlaceholder.use((req: Request, res: Response, next: NextFunction) => {
 
     if (errorsArray.length !== 0) {
         res.status(400);
-        res.json({ errorsArray });
+        res.json({
+            error: {
+                code: 400,
+                message: errorsArray
+            }
+        });
         return;
     }
 
@@ -46,7 +51,11 @@ createPlaceholder.get("/", (req: Request, res: Response) => {
         res.sendFile(createPlaceholderImagePath(image));
         return;
     }
-    createImage(image).then((img: string | undefined): void => res.sendFile(img || ""));
+    createImage(image).then((img: string | undefined): void => {
+        res.setHeader("hhhhh", "baaaaa");
+        res.type("png");
+        res.sendFile(img || "");
+    });
 });
 
 export default createPlaceholder;

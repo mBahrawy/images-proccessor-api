@@ -1,27 +1,9 @@
-import supertest from "supertest";
-import server from "../../server";
+import request from "supertest";
+import app from "../../server";
 
-const request = supertest(server);
-
-describe("Server started,", function () {
-    it("should start server home page", async function () {
-        const response = await request.get("/").set("Accept", "application/json");
-        expect(response.status).toEqual(200);
+describe("Check app home page", () => {
+    it("should start server and load home page", (done) => {
+        request(app).get("/").set("Accept", "application/json").expect("Content-Type", "text/html; charset=utf-8");
+        done();
     });
 });
-
-// import { getPost } from "../index";
-
-// it("should get post data with id=1", async () => {
-//     const response: any = await getPost(1);
-//     expect(response.data).toEqual({
-//         userId: 1,
-//         id: 1,
-//         title: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-//         body:
-//             "quia et suscipit\n" +
-//             "suscipit recusandae consequuntur expedita et cum\n" +
-//             "reprehenderit molestiae ut ut quas totam\n" +
-//             "nostrum rerum est autem sunt rem eveniet architecto"
-//     });
-// });

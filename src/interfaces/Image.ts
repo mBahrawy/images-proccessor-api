@@ -1,4 +1,4 @@
 export interface Image {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
 }

@@ -16,6 +16,13 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     };
 };
 
+export const generateIditImageInfo = ({ body }: Request): Image => {
+    return {
+        ...(body?.width && { width: +body.width }),
+        ...(body?.height && { height: +body.height })
+    };
+};
+
 export const createTextSVG = (width: number, height: number, text: string, textcolor: string) => {
     let modText = "";
     text.length <= 15 ? (modText = text) : (modText = text.slice(0, 15));
@@ -64,7 +71,7 @@ export const isImageExsists = (image: PlaceholderImage): Boolean => {
     return false;
 };
 
-export const editedImage = async (imageBuffer: Buffer, imageOptions: Image): Promise<string | undefined> => {
+export const editedImage = async (imageBuffer: Buffer, imageOptions: Image): Promise<string | null> => {
     const imageFile = createEditedImagePath("image", genUniqueId());
 
     try {
@@ -78,5 +85,6 @@ export const editedImage = async (imageBuffer: Buffer, imageOptions: Image): Pro
         return imageFile;
     } catch (e) {
         console.log(e);
+        return null;
     }
 };
