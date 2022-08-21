@@ -20,7 +20,7 @@ app.use(morgan("dev"));
 
 // TODO Create needed iamges folders if doesnt exixsts
 // Require static assets from public folder
-app.use(express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(__dirname, "./public")));
 
 // Set 'views' directory for any views
 app.set("views", path.join(__dirname, "views"));
@@ -30,6 +30,7 @@ app.engine("html", ejs.renderFile);
 app.set("view engine", "html");
 
 app.use("/", routes);
+
 
 // start express server
 app.listen(PORT, () => {

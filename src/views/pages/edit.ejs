@@ -9,44 +9,58 @@
 
   <main class="min-vh-100 d-flex flex-column">
 
-    <div class="container py-5 flex-grow-1 d-flex flex-column">
+    <div class="container px-md-5  py-5 flex-grow-1 d-flex flex-column">
 
-      <div class="row justify-content-center flex-grow-1">
-        <div class="col-md-8">
+      <div class="row  justify-content-center flex-grow-1">
+        <div class="col-md-6 ">
           <h4 class="text-center mb-5">Image editor online</h4>
-          <form method="post" enctype="multipart/form-data" action="edit/api">
+          <form id="imageForm" method="post" enctype="multipart/form-data" action="edit/api">
 
             <div class="row p-0">
 
               <div class="col-sm-6 mb-3">
                 <label class="form-label">width</label>
-                <input type="number" class="form-control" name="width" placeholder="Put image width">
+                <input type="text" class="form-control" name="width" id="widthInput" placeholder="Put image width">
               </div>
 
               <div class="col-sm-6 mb-3">
                 <label class="form-label">height</label>
-                <input type="number" class="form-control" name="height" placeholder="Put image height">
+                <input type="text" class="form-control" name="height" id="heightInput" placeholder="Put image height">
+              </div>
+
+              <div class="col-sm-6 mb-3">
+                <label for="formFile" class="form-label">Select an image</label>
+                <input name="image" class="form-control" type="file" accept="image/*" onchange="loadFile(event)"
+                  id="fileInput" id="formFile">
+              </div>
+
+              <div class="col-sm-6 mb-3">
+                <label for="formFile" class="form-label">Save as</label>
+
+                <select class="form-select" name="extension" id="extensionInput" aria-label="Default select example">
+                  <option selected value="png">PNG</option>
+                  <option value="jpg">JPG</option>
+                  <option value="gif">GIF</option>
+                  <option value="webp">WEBP</option>
+                </select>
               </div>
 
               <div class="col-sm-12 mb-3">
-                <label for="formFile" class="form-label">Select an image</label>
-                <input name="image" class="form-control" type="file" id="formFile">
+                <button type="submit" class="btn btn-primary w-100 mb-3">Proccess image and download</button>
               </div>
 
-
-              <div class="col-sm-6 mb-3">
-                <button type="submit" class="btn btn-primary">Upload</button>
+              <div class="col-sm-12 mb-3 text-danger" id="errorContainer">
+               
               </div>
-
-
 
             </div>
-
           </form>
+        </div>
 
+        <div class="col-md-6">
+          <img src="#" alt="" id="preview" class="img-fluid w-100">
         </div>
       </div>
-
 
     </div>
     <footer>
@@ -54,8 +68,68 @@
     </footer>
   </main>
 
+  <script>
+
+    $("form").on("submit", function (event) {
+      $("#errorContainer").html("");
+      event.preventDefault();
+      const formData = new FormData(this);
+      sendData(formData);
+    });
 
 
+    const sendData = async (formData) => {
+      const options = {
+        headers: {
+          Accept: 'application/json',
+        },
+        method: "POST",
+        cache: 'no-cache',
+        body: formData,
+
+      }
+
+      try {
+        const request = await fetch("edit/api", options);
+        const response = await request.json();
+
+       if (response.status === 200) {
+         const downloadImg = await download(response.data.image_url, `${response.data.original_name}.${response.data.format}`);
+         $("#errorContainer").html(`<h6 class="text-success"><b>Success :)</b></h6>`);
+
+        } else {
+        throw new Error(JSON.stringify(response.error))
+       }
+
+      } catch (error) {
+        const parsedError = JSON.parse(error.message)
+        console.log(parsedError);
+        const errorNodes = parsedError.message.map(err => `<li>${err}</li>`).join('');
+        $("#errorContainer").html(`<h6><b>You have the following errors:</b></h6><ul>${errorNodes}</ul>`);
+      }
+      
+    
+
+        
+    }
+
+    const download = (dataUrl, filename) => {
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = filename;
+      link.click();
+    };
+
+    const loadFile = (event) => {
+      const output = document.getElementById('preview');
+      output.src = URL.createObjectURL(event.target.files[0]);
+      output.onload =  () => {
+        URL.revokeObjectURL(output.src)
+      }
+    };
+
+
+  </script>
 </body>
 
 </html>

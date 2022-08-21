@@ -11,6 +11,10 @@ export const createPlaceholderImagePath = (image: PlaceholderImage): string => {
     );
 };
 
-export const createEditedImagePath = (image: string, id: string): string => {
-    return path.join(__basedir, "public", "images", "edited-images", `${id}.png`);
+export const createEditedImagePath = (image: string, id: string, extension: string): string => {
+    return path.join(__basedir, "public", "images", "edited-images", `${id}.${extension}`);
+};
+
+export const getPublicAssetUrl = (file: string): string => {
+    return `http://localhost:3000/${file}`;
 };

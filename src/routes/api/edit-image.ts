@@ -1,8 +1,11 @@
 import express, { NextFunction, Request, Response, Router } from "express";
 import multer from "multer";
-import path from "path";
 import { Image } from "../../interfaces/Image";
-import { editedImage, generateIditImageInfo } from "../../utilities/images";
+import { editedImage, generateIditImageInfo, isImageExsists } from "../../utilities/images";
+import { Extension } from "../../interfaces/Image";
+import path from "path";
+import { genUniqueId } from "../../utilities/id-generator";
+import { getPublicAssetUrl } from "../../utilities/path-utilities";
 
 const editImage: Router = express.Router();
 
@@ -24,24 +27,27 @@ editImage.use(upload.single("image"));
 // Validation middleware
 editImage.use((req: Request, res: Response, next: NextFunction) => {
     const errorsArray: string[] = [];
+    const extensionsArray: Extension[] = ["png", "jpg", "gif", "webp"];
 
     !req.file && errorsArray.push("Please provide an image.");
-    !req.body.width && errorsArray.push("Please provide an image.");
 
     if (req.body.width) {
         isNaN(Number(req.body.width)) && errorsArray.push("Please provide a valid width.");
-        Number(req.query.width) > 20000 && errorsArray.push("Image width is too large, max is 20000px.");
+        Number(req.body.width) > 20000 && errorsArray.push("Image width is too large, max is 20000px.");
     }
     if (req.body.height) {
         isNaN(Number(req.body.height)) && errorsArray.push("Please provide a valid height.");
-        Number(req.query.height) > 20000 && errorsArray.push("Image height is too large, max is 20000px.");
+        Number(req.body.height) > 20000 && errorsArray.push("Image height is too large, max is 20000px.");
+    }
+    if (req.body.extension) {
+        !extensionsArray.includes(req.body.extension) && errorsArray.push("Please provide a valid extension.");
     }
 
     if (errorsArray.length !== 0) {
         res.status(400);
         res.json({
+            status: 400,
             error: {
-                code: 400,
                 message: errorsArray
             }
         });
@@ -54,7 +60,30 @@ editImage.use((req: Request, res: Response, next: NextFunction) => {
 editImage.post("/", (req: Request, res: Response) => {
     if (!req.file) return;
     const editOptions: Image = generateIditImageInfo(req);
-    editedImage(req.file.buffer, editOptions).then((img: string | null): void => res.sendFile(img || ""));
+    const imgaeId = genUniqueId();
+
+    editedImage(req.file.buffer, imgaeId, editOptions).then((img: string | null): void => {
+        if (!img || !isImageExsists(img)) {
+            res.status(500).json({
+                status: 500,
+                error: {
+                    message: "internal server error"
+                }
+            });
+            return;
+        }
+
+        res.status(200).json({
+            status: 200,
+            data: {
+                original_name: "api",
+                image_url: getPublicAssetUrl(`public/images/edited-images/${imgaeId}.${req.body.extension}`),
+                format: req.body.extension,
+                width: req.body.width,
+                height: req.body.height
+            }
+        });
+    });
 });
 
 export default editImage;

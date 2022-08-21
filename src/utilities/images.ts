@@ -19,7 +19,8 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
 export const generateIditImageInfo = ({ body }: Request): Image => {
     return {
         ...(body?.width && { width: +body.width }),
-        ...(body?.height && { height: +body.height })
+        ...(body?.height && { height: +body.height }),
+        ...(body?.extension && { extension: body.extension })
     };
 };
 
@@ -36,55 +37,61 @@ export const createTextSVG = (width: number, height: number, text: string, textc
             `;
 };
 
-export const createImage = async (image: PlaceholderImage): Promise<string | undefined> => {
+export const createImage = async (image: PlaceholderImage): Promise<string | null> => {
     const svgBuffer = Buffer.from(createTextSVG(image.width, image.height, image.text, image.textcolor));
-    const imageFile = createPlaceholderImagePath(image);
-    try {
-        await sharp({
-            create: {
-                width: image.width,
-                height: image.height,
-                background: image.background,
-                channels: 3
-            }
+    const imagePath = createPlaceholderImagePath(image);
+
+    return sharp({
+        create: {
+            width: image.width,
+            height: image.height,
+            background: image.background,
+            channels: 3
+        }
+    })
+        .png()
+        .composite([{ input: svgBuffer, left: 0, top: 0 }])
+        .toBuffer()
+        .then((imgBuffer) => {
+            fs.writeFileSync(createPlaceholderImagePath(image), imgBuffer);
+            return imagePath;
         })
-            .png()
-            .composite([{ input: svgBuffer, left: 0, top: 0 }])
-            .toFile(imageFile);
-        return imageFile;
-    } catch (e) {
-        console.log(e);
-    }
+        .catch((e) => {
+            console.log(e);
+            return null;
+        });
 };
 
-export const isImageExsists = (image: PlaceholderImage): Boolean => {
-    const imageFile = createPlaceholderImagePath(image);
+export const isImageExsists = (image: string): Boolean => {
     try {
-        if (fs.existsSync(imageFile)) {
+        if (fs.existsSync(image)) {
             return true;
         }
     } catch (err) {
         console.error(err);
         return false;
     }
-
     return false;
 };
 
-export const editedImage = async (imageBuffer: Buffer, imageOptions: Image): Promise<string | null> => {
-    const imageFile = createEditedImagePath("image", genUniqueId());
+export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOptions: Image): Promise<string | null> => {
+    const imageFile = createEditedImagePath("image", imgaeId, imageOptions.extension);
 
-    try {
-        await sharp(imageBuffer)
-            .resize(imageOptions.width, imageOptions.height, {
-                fit: sharp.fit.inside,
-                withoutEnlargement: true
-            })
-            .toFile(imageFile);
+    return sharp(imageBuffer)
+        .resize(imageOptions.width, imageOptions.height, {
+            fit: sharp.fit.inside,
+            withoutEnlargement: true
+        })
+        .toFormat("png")
 
-        return imageFile;
-    } catch (e) {
-        console.log(e);
-        return null;
-    }
+        .toBuffer()
+
+        .then((imgBuffer) => {
+            fs.writeFileSync(imageFile, imgBuffer);
+            return imageFile;
+        })
+        .catch((e) => {
+            console.log(e);
+            return null;
+        });
 };

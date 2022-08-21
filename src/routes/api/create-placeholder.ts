@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response, Router } from "express";
+import path from "path";
 import { createImage, generateImageInfo, isImageExsists } from "../../utilities/images";
 import { createPlaceholderImagePath } from "../../utilities/path-utilities";
 
@@ -46,15 +47,49 @@ createPlaceholder.use((req: Request, res: Response, next: NextFunction) => {
 
 createPlaceholder.get("/", (req: Request, res: Response) => {
     const image = generateImageInfo(req);
+
     // Check if image is aready genrated for improving preformance
-    if (isImageExsists(image)) {
+    if (isImageExsists(createPlaceholderImagePath(image))) {
+        res.setHeader("Content-Type", "Image/png");
+        res.status(304);
         res.sendFile(createPlaceholderImagePath(image));
         return;
     }
-    createImage(image).then((img: string | undefined): void => {
-        res.setHeader("hhhhh", "baaaaa");
-        res.type("png");
-        res.sendFile(img || "");
+    createImage(image).then((img: string | null): void => {
+        if (!img) {
+            res.status(500).json({
+                error: {
+                    code: 500,
+                    message: "internal server error, null resulted image"
+                }
+            });
+            return;
+        }
+
+        if (!isImageExsists(img)) {
+            res.status(500).json({
+                error: {
+                    code: 500,
+                    message: "internal server error, no image in folder"
+                }
+            });
+            return;
+        }
+
+        res.setHeader("Content-Type", "Image/png");
+        res.sendFile(img);
+
+        const options = {
+            root: path.join(__dirname, "public"),
+            dotfiles: "deny",
+            headers: {
+                "x-timestamp": Date.now(),
+                "x-sent": true,
+                "Content-Type": "image/png"
+            }
+        };
+
+        res.sendFile(img, options, (err) => err && console.log(err));
     });
 });
 
