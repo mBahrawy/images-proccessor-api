@@ -15,7 +15,7 @@ First, open terminal inside project directory, and run these commands
 
 ## How to use Image proccessor API:
 
-1. ### For creating placeholder image, go to route `/create`
+### 1. For creating placeholder image, go to route `/create`
 this will create a default image, for custmoizing image add some query params:
 
   - width=3000
