@@ -1,27 +1,46 @@
 # Images-proccessor-api
 This project for Udacity EgFwd Fullstack Nanodegree project 
 
-You can use the API directly or through my [React Frontend project](https://github.com/mBahrawy/image-proccessor-frontend),
+You can use the API directly or through my [React Frontend project](https://github.com/mBahrawy/image-proccessor-frontend).
+
+----
+
+## How to run Image proccessor API project:
+
+First, open terminal inside project directory, and run these commands
+
+- First, run `npm i` for installing needed dependancies.
+
+- Then type `npm start` for running development environment (through port will be 4000).
+
+- Or type `npm run start:build` for building and serving a production version (through port will be 8000).
+
+- For running test, type `npm run test`
+
 
 ----
 
 ## How to use Image proccessor API:
-First, open terminal inside project directory, and run these commands
 
-```
-npm i
-npm start
-```
+1. For creating placeholder image, go to route `/create`
+this will create a default image, for custmoizing image add some query params:
 
-----
+  - width=3000
+  - height=3000
+  - background=00ff00
+  - text=DummyText
+  - color=aaaaaa
+
+for example: `http://localhost:4000?width=3000&height=3000&background=00ff00&text=DummyText&color=aaaaaa`
 
 
-**If you want to use the Frontend**, got to this project and hit
 
-```
-npm i
-npm start
-```
 
-Go to http://localhost:3000/edit , upload and edit your image, there is no screen for creating image placeholder for now, will be created soon.
+## If you want to use the Frontend
 
+  - Got to the Frontend react app repo: https://github.com/mBahrawy/image-proccessor-frontend
+  - Clone locallay
+  - Run `npmi` then `npm start`
+  - Go to http://localhost:3000/edit , upload and edit your image
+
+There is no screen for creating image placeholder for now, will be created soon.
