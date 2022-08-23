@@ -30,7 +30,7 @@ A frontend screen will be created soon to create a placholder image thought an i
 Also please note that a caching proccess happen, if image was already created previously with same properties, It will be loaded instead of creating new one.
 
 
-2. ### For edit an exsisting image, go to route `/edit`
+### 2. For edit an exsisting image, go to route `/edit`
 **You must send an image to this request body (field name is "image"), and the file it must be an image formate.**
 
 To edit an image, send formData with any of the follown agrumant, non of them is required but they will be validated if exisits.
@@ -52,7 +52,7 @@ or you can use the frontend app for easier using and better visualized errors va
 
   - Got to the Frontend react app repo: https://github.com/mBahrawy/image-proccessor-frontend
   - Clone locallay
-  - Run `npmi` then `npm start`
+  - Run `npm i` then `npm start`
   - Go to http://localhost:3000/edit , upload and edit your image
   - Go to the backend app directory, run it in dev mode `npm start` 
 
