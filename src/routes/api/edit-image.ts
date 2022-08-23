@@ -1,10 +1,11 @@
-import express, { NextFunction, Request, Response, Router } from "express";
-import multer from "multer";
+import path from "path";
+import editImageMiddleware from "../../middlewares/edit-image-middleware";
+import express, { Request, Response, Router } from "express";
 import { Image } from "../../interfaces/Image";
-import { editedImage, generateIditImageInfo, isImageExsists } from "../../utilities/images";
-import { Extension } from "../../interfaces/Image";
-import { genUniqueId } from "../../utilities/id-generator";
+import { editedImage, generateIditImageInfo, isImageExsists } from "../../utilities/images-utilities";
+import { genUniqueId } from "../../utilities/string-utlities";
 import { getPublicAssetUrl } from "../../utilities/path-utilities";
+import uploadingImageMiddleware from "../../middlewares/uploading-image-middleware";
 
 const editImage: Router = express.Router();
 
@@ -15,60 +16,24 @@ editImage.use(express.json());
 editImage.use(express.urlencoded({ extended: true }));
 
 // For image upload
-const upload = multer({
-    limits: {
-        fileSize: 4 * 1024 * 1024
-    }
-});
-
-editImage.use(upload.single("image"));
+editImage.use(uploadingImageMiddleware);
 
 // Validation middleware
-editImage.use((req: Request, res: Response, next: NextFunction) => {
-    const errorsArray: string[] = [];
-    const extensionsArray: Extension[] = ["png", "jpg", "gif", "webp"];
-
-    !req.file && errorsArray.push("Please provide an image.");
-
-    if (req.body.width) {
-        isNaN(Number(req.body.width)) && errorsArray.push("Please provide a valid width.");
-        Number(req.body.width) > 20000 && errorsArray.push("Image width is too large, max is 20000px.");
-    }
-    if (req.body.height) {
-        isNaN(Number(req.body.height)) && errorsArray.push("Please provide a valid height.");
-        Number(req.body.height) > 20000 && errorsArray.push("Image height is too large, max is 20000px.");
-    }
-    if (req.body.extension) {
-        !extensionsArray.includes(req.body.extension) && errorsArray.push("Please provide a valid extension.");
-    }
-
-    if (errorsArray.length !== 0) {
-        res.status(400);
-        res.json({
-            status: 400,
-            error: {
-                message: errorsArray
-            }
-        });
-        return;
-    }
-
-    next();
-});
+editImage.use(editImageMiddleware);
 
 editImage.post("/", (req: Request, res: Response) => {
     if (!req.file) return;
     const editOptions: Image = generateIditImageInfo(req);
+    const originalname = req.file.originalname as string;
+    const imageExtension = (req.body.extension as string) || path.extname(originalname).replaceAll(".", "") || "png";
     const imgaeId = genUniqueId();
 
-    editedImage(req.file.buffer, imgaeId, editOptions).then((img: string | null): void => {
-        console.log(!img , !isImageExsists(img));
-        
-        if (!img || !isImageExsists(img)) {
-            res.status(404).json({
-                status: 404,
+    editedImage(req.file.buffer, imgaeId, editOptions).then((resultedImagePath): void => {
+        if (!resultedImagePath || !isImageExsists(resultedImagePath as string)) {
+            res.status(500).json({
+                status: 500,
                 error: {
-                    message: ["Image not found"]
+                    message: ["Internal server error"]
                 }
             });
             return;
@@ -77,8 +42,8 @@ editImage.post("/", (req: Request, res: Response) => {
         res.status(200).json({
             status: 200,
             data: {
-                original_name: "api",
-                image_url: getPublicAssetUrl(req, `public/images/edited-images/${imgaeId}.${req.body.extension}`),
+                original_name: path.parse(originalname).name,
+                image_url: getPublicAssetUrl(req, `public/images/edited-images/${imgaeId}.${imageExtension}`),
                 format: req.body.extension,
                 width: req.body.width,
                 height: req.body.height

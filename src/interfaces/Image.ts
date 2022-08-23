@@ -4,4 +4,4 @@ export interface Image {
     extension: Extension;
 }
 
-export type Extension = "png" | "jpg" | "gif" | "webp";
+export type Extension = "png" | "jpg" | "gif" | "webp" | "jpeg";

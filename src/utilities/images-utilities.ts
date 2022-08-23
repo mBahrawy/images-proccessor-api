@@ -1,9 +1,16 @@
 import sharp from "sharp";
 import * as fs from "fs";
-import { PlaceholderImage } from "./../interfaces/PlaceholderImage";
+import { PlaceholderImage } from "../interfaces/PlaceholderImage";
 import { Request } from "express";
 import { createPlaceholderImagePath, createEditedImagePath } from "./path-utilities";
 import { Image } from "../interfaces/Image";
+import path from "path";
+
+export const isImageExsists = (image: string): Boolean => {
+    if (!image) return false;
+    if (fs.existsSync(image)) return true;
+    return false;
+};
 
 export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     return {
@@ -15,11 +22,13 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     };
 };
 
-export const generateIditImageInfo = ({ body }: Request): Image => {
+export const generateIditImageInfo = ({ body, file }: Request): Image => {
+    const originalFilename = file?.originalname as string;
+    const originalExtention = path.extname(originalFilename).replaceAll(".", "") || "png";
     return {
         ...(body?.width && { width: +body.width }),
         ...(body?.height && { height: +body.height }),
-        ...(body?.extension && { extension: body.extension })
+        ...(body?.extension ? { extension: body.extension } : { extension: originalExtention })
     };
 };
 
@@ -66,30 +75,27 @@ export const createImage = async (imageInfo: PlaceholderImage): Promise<string |
         });
 };
 
-export const isImageExsists = (image: string | null): Boolean => {
-    if (!image) return false;
-    if (fs.existsSync(image)) return true;
-    return false;
-};
-
-export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOptions: Image): Promise<string | null> => {
-    const imageFile = createEditedImagePath("image", imgaeId, imageOptions.extension);
-
-    return sharp(imageBuffer)
+export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOptions: Image): Promise<string | void> => {
+    return await sharp(imageBuffer)
         .resize(imageOptions.width, imageOptions.height, {
             fit: sharp.fit.inside,
             withoutEnlargement: true
         })
-        .toFormat("png")
-
+        .toFormat(imageOptions.extension)
         .toBuffer()
-
-        .then((imgBuffer) => {
-            fs.writeFileSync(imageFile, imgBuffer);
-            return imageFile;
+        .then((imageBuffer: Buffer) => {
+            const imagePath = createEditedImagePath("image", imgaeId, imageOptions.extension);
+            return new Promise<string | void>((resolve, reject) => {
+                fs.writeFile(imagePath, imageBuffer, function (err) {
+                    if (err) {
+                        console.log("error happned while creating image from buffer");
+                        reject();
+                    }
+                    resolve(imagePath);
+                });
+            });
         })
-        .catch((e) => {
-            console.log(e);
-            return null;
+        .catch((error) => {
+            console.log(error);
         });
 };

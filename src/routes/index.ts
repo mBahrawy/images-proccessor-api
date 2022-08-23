@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import createPlaceholder from "./api/create-placeholder";
 import editedImage from "./api/edit-image";
-import logger from "../utilities/logger";
+import logger from "../utilities/logging-untilities";
 
 const routes: Router = express.Router();
 
