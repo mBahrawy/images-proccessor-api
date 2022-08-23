@@ -1,7 +1,6 @@
 import sharp from "sharp";
 import * as fs from "fs";
 import { PlaceholderImage } from "./../interfaces/PlaceholderImage";
-import { genUniqueId } from "./id-generator";
 import { Request } from "express";
 import { createPlaceholderImagePath, createEditedImagePath } from "./path-utilities";
 import { Image } from "../interfaces/Image";
@@ -11,7 +10,7 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
         ...(query?.width ? { width: +query.width } : { width: 300 }),
         ...(query?.height ? { height: +query.height } : { height: 300 }),
         ...(query?.text ? { text: `${query.text}` } : { text: "Placeholder" }),
-        ...(query?.textcolor ? { textcolor: `#${query.textcolor}` } : { textcolor: "#000000" }),
+        ...(query?.color ? { color: `#${query.color}` } : { color: "#000000" }),
         ...(query?.background ? { background: `#${query.background}` } : { background: `#ffffff` })
     };
 };
@@ -24,53 +23,52 @@ export const generateIditImageInfo = ({ body }: Request): Image => {
     };
 };
 
-export const createTextSVG = (width: number, height: number, text: string, textcolor: string) => {
+export const createTextSVG = (width: number, height: number, text: string, color: string) => {
     let modText = "";
     text.length <= 15 ? (modText = text) : (modText = text.slice(0, 15));
     return `
             <svg width="${width}" height="${height}">
                 <style>
-                    .title { fill: ${textcolor}; font: bold 36px sans-serif;}
+                    .title { fill: ${color}; font: bold 36px sans-serif;}
                 </style>
                 <text x="50%" y="50%" text-anchor="middle" class="title">${modText}</text>
             </svg>
             `;
 };
 
-export const createImage = async (image: PlaceholderImage): Promise<string | null> => {
-    const svgBuffer = Buffer.from(createTextSVG(image.width, image.height, image.text, image.textcolor));
-    const imagePath = createPlaceholderImagePath(image);
-
-    return sharp({
+export const createImage = async (imageInfo: PlaceholderImage): Promise<string | void> => {
+    const svgBuffer = Buffer.from(createTextSVG(imageInfo.width, imageInfo.height, imageInfo.text, imageInfo.color));
+    return await sharp({
         create: {
-            width: image.width,
-            height: image.height,
-            background: image.background,
+            width: imageInfo.width,
+            height: imageInfo.height,
+            background: imageInfo.background,
             channels: 3
         }
     })
         .png()
         .composite([{ input: svgBuffer, left: 0, top: 0 }])
         .toBuffer()
-        .then((imgBuffer) => {
-            fs.writeFileSync(createPlaceholderImagePath(image), imgBuffer);
-            return imagePath;
+        .then((imageBuffer: Buffer) => {
+            const imagePath = createPlaceholderImagePath(imageInfo);
+            return new Promise<string | void>((resolve, reject) => {
+                fs.writeFile(imagePath, imageBuffer, function (err) {
+                    if (err) {
+                        console.log("error happned while creating image from buffer");
+                        reject();
+                    }
+                    resolve(imagePath);
+                });
+            });
         })
-        .catch((e) => {
-            console.log(e);
-            return null;
+        .catch((error) => {
+            console.log(error);
         });
 };
 
-export const isImageExsists = (image: string): Boolean => {
-    try {
-        if (fs.existsSync(image)) {
-            return true;
-        }
-    } catch (err) {
-        console.error(err);
-        return false;
-    }
+export const isImageExsists = (image: string | null): Boolean => {
+    if (!image) return false;
+    if (fs.existsSync(image)) return true;
     return false;
 };
 

@@ -2,13 +2,16 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import routes from "./routes/index";
 import path from "path";
-import * as ejs from "ejs";
+import cors from "cors";
 import * as dotenv from "dotenv";
+import * as fs from "fs";
 
 // Defining app base folder
 global.__basedir = __dirname;
 
-dotenv.config();
+console.log(`App started in ${process.env.NODE_ENV} mode`);
+
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const PORT = process.env.APP_BACKEND_PORT || 3000;
 
@@ -18,19 +21,22 @@ const app: Application = express();
 // HTTP request logger middleware
 app.use(morgan("dev"));
 
-// TODO Create needed iamges folders if doesnt exixsts
+// Creating needed folders
+const placeholderFolder = `${process.env.NODE_ENV === "development" ? "src" : "build"}/public/images/placeholders`;
+const editedImagesFolder = `${process.env.NODE_ENV === "development" ? "src" : "build"}/public/images/edited-images`;
+!fs.existsSync(placeholderFolder) && fs.mkdirSync(placeholderFolder, { recursive: true });
+!fs.existsSync(editedImagesFolder) && fs.mkdirSync(editedImagesFolder, { recursive: true });
+
 // Require static assets from public folder
 app.use("/public", express.static(path.join(__dirname, "./public")));
 
-// Set 'views' directory for any views
-app.set("views", path.join(__dirname, "views"));
-
-// Set view engine as EJS
-app.engine("html", ejs.renderFile);
-app.set("view engine", "html");
-
+// CORS
+app.use(
+    cors({
+        origin: ["http://localhost:3001", "http://localhost:3000"]
+    })
+);
 app.use("/", routes);
-
 
 // start express server
 app.listen(PORT, () => {

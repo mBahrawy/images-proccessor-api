@@ -1,9 +1,12 @@
-import request from "supertest";
+import supertest from "supertest";
 import app from "../../server";
 
+const request: supertest.SuperTest<supertest.Test> = supertest(app);
+
 describe("Check app home page", () => {
-    it("should start server and load home page", (done) => {
-        request(app).get("/").set("Accept", "application/json").expect("Content-Type", "text/html; charset=utf-8");
-        done();
+    it("should api load home route", async (): Promise<void> => {
+        const response: supertest.Response = await request.get("/");
+        expect(response.type).toBe("text/html");
+        expect(response.status).toBe(200);
     });
 });

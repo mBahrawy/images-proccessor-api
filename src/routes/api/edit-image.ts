@@ -3,7 +3,6 @@ import multer from "multer";
 import { Image } from "../../interfaces/Image";
 import { editedImage, generateIditImageInfo, isImageExsists } from "../../utilities/images";
 import { Extension } from "../../interfaces/Image";
-import path from "path";
 import { genUniqueId } from "../../utilities/id-generator";
 import { getPublicAssetUrl } from "../../utilities/path-utilities";
 
@@ -63,11 +62,13 @@ editImage.post("/", (req: Request, res: Response) => {
     const imgaeId = genUniqueId();
 
     editedImage(req.file.buffer, imgaeId, editOptions).then((img: string | null): void => {
+        console.log(!img , !isImageExsists(img));
+        
         if (!img || !isImageExsists(img)) {
-            res.status(500).json({
-                status: 500,
+            res.status(404).json({
+                status: 404,
                 error: {
-                    message: "internal server error"
+                    message: ["Image not found"]
                 }
             });
             return;
@@ -77,7 +78,7 @@ editImage.post("/", (req: Request, res: Response) => {
             status: 200,
             data: {
                 original_name: "api",
-                image_url: getPublicAssetUrl(`public/images/edited-images/${imgaeId}.${req.body.extension}`),
+                image_url: getPublicAssetUrl(req, `public/images/edited-images/${imgaeId}.${req.body.extension}`),
                 format: req.body.extension,
                 width: req.body.width,
                 height: req.body.height

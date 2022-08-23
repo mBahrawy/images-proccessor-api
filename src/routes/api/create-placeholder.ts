@@ -27,8 +27,8 @@ createPlaceholder.use((req: Request, res: Response, next: NextFunction) => {
         !colorRegex.test(`#${req.query.background}`) && errorsArray.push("Please provide a valid background color format (Eg. aa11cc)");
     }
 
-    if (req.query.textcolor) {
-        !colorRegex.test(`#${req.query.textcolor}`) && errorsArray.push("Please provide a valid text color format (Eg. aa11cc)");
+    if (req.query.color) {
+        !colorRegex.test(`#${req.query.color}`) && errorsArray.push("Please provide a valid text color format (Eg. aa11cc)");
     }
 
     if (errorsArray.length !== 0) {
@@ -46,50 +46,39 @@ createPlaceholder.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 createPlaceholder.get("/", (req: Request, res: Response) => {
-    const image = generateImageInfo(req);
+
+    const imageInfo = generateImageInfo(req);
+    const imagePath = createPlaceholderImagePath(imageInfo);
 
     // Check if image is aready genrated for improving preformance
-    if (isImageExsists(createPlaceholderImagePath(image))) {
-        res.setHeader("Content-Type", "Image/png");
-        res.status(304);
-        res.sendFile(createPlaceholderImagePath(image));
+    if (isImageExsists(imagePath)) {
+        // res.setHeader("Content-Type", "Image/png");
+        res.sendFile(imagePath);
         return;
     }
-    createImage(image).then((img: string | null): void => {
-        if (!img) {
+    createImage(imageInfo).then((resultedImagePath): void => {
+        if (!resultedImagePath) {
             res.status(500).json({
+                status: 500,
                 error: {
-                    code: 500,
-                    message: "internal server error, null resulted image"
+                    message: ["internal server error, no resulted image"]
                 }
             });
             return;
         }
 
-        if (!isImageExsists(img)) {
+        if (!isImageExsists(resultedImagePath)) {
             res.status(500).json({
+                status: 500,
                 error: {
-                    code: 500,
-                    message: "internal server error, no image in folder"
+                    message: ["internal server error, no image found in folder"]
                 }
             });
             return;
         }
 
-        res.setHeader("Content-Type", "Image/png");
-        res.sendFile(img);
-
-        const options = {
-            root: path.join(__dirname, "public"),
-            dotfiles: "deny",
-            headers: {
-                "x-timestamp": Date.now(),
-                "x-sent": true,
-                "Content-Type": "image/png"
-            }
-        };
-
-        res.sendFile(img, options, (err) => err && console.log(err));
+        // res.setHeader("Content-Type", "Image/png");
+        res.sendFile(resultedImagePath);
     });
 });
 

@@ -3,5 +3,5 @@ export interface PlaceholderImage {
     height: number;
     background: string;
     text: string;
-    textcolor: string;
+    color: string;
 }
