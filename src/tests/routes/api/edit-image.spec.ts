@@ -46,7 +46,7 @@ describe("Edit uploaded image", () => {
     });
     it("should provide an implemented image extention", async (): Promise<void> => {
         const response: supertest.Response = await request.post("/edit").attach("image", testImagepath).field("extension", "mp4");
-        console.log(response.body.error);
+        // console.log(response.body.error);
         expect(response.type).toBe("application/json");
         expect(response.status).toBe(400);
     });

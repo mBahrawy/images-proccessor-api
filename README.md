@@ -54,5 +54,7 @@ or you can use the frontend app for easier using and better visualized errors va
   - Clone locallay
   - Run `npmi` then `npm start`
   - Go to http://localhost:3000/edit , upload and edit your image
+  - Go to the backend app directory, run it in dev mode `npm start` 
 
+Note: the build Version of the backend will not work, use development version.
 There is no screen for creating image placeholder for now, will be created soon.

@@ -1,13 +1,8 @@
-import express, { Request, Response, Router } from "express";
-import createImageMiddleware from "../../middlewares/create-image-middleware";
-import { createImage, generateImageInfo, isImageExsists } from "../../utilities/images-utilities";
-import { createPlaceholderImagePath } from "../../utilities/path-utilities";
+import { Request, Response } from "express";
+import { createImage, generateImageInfo, isImageExsists } from "../utilities/images-utilities";
+import { createPlaceholderImagePath } from "../utilities/path-utilities";
 
-const createPlaceholder: Router = express.Router();
-
-createPlaceholder.use(createImageMiddleware);
-
-createPlaceholder.get("/", (req: Request, res: Response) => {
+const createImageController = (req: Request, res: Response) => {
     const imageInfo = generateImageInfo(req);
     const imagePath = createPlaceholderImagePath(imageInfo);
 
@@ -28,6 +23,6 @@ createPlaceholder.get("/", (req: Request, res: Response) => {
         }
         res.sendFile(resultedImagePath);
     });
-});
+};
 
-export default createPlaceholder;
+export default createImageController;

@@ -15,7 +15,7 @@ const editImageController = (req: Request, res: Response) => {
     editedImage(req.file.buffer, imgaeId, editOptions).then((resultedImagePath): void => {
         if (!resultedImagePath || !isImageExsists(resultedImagePath as string)) {
             res.status(500).json({
-                status: 500, 
+                status: 500,
                 error: {
                     message: ["Internal server error"]
                 }

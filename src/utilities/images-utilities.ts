@@ -63,6 +63,7 @@ export const createImage = async (imageInfo: PlaceholderImage): Promise<string |
             return new Promise<string | void>((resolve, reject) => {
                 fs.writeFile(imagePath, imageBuffer, function (err) {
                     if (err) {
+                        // eslint-disable-next-line no-console
                         console.log("error happned while creating image from buffer");
                         reject();
                     }
@@ -71,6 +72,7 @@ export const createImage = async (imageInfo: PlaceholderImage): Promise<string |
             });
         })
         .catch((error) => {
+            // eslint-disable-next-line no-console
             console.log(error);
         });
 };
@@ -78,8 +80,7 @@ export const createImage = async (imageInfo: PlaceholderImage): Promise<string |
 export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOptions: Image): Promise<string | void> => {
     return await sharp(imageBuffer)
         .resize(imageOptions.width, imageOptions.height, {
-            fit: sharp.fit.inside,
-            withoutEnlargement: true
+            fit: sharp.fit.cover
         })
         .toFormat(imageOptions.extension)
         .toBuffer()
@@ -88,6 +89,7 @@ export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOpt
             return new Promise<string | void>((resolve, reject) => {
                 fs.writeFile(imagePath, imageBuffer, function (err) {
                     if (err) {
+                        // eslint-disable-next-line no-console
                         console.log("error happned while creating image from buffer");
                         reject();
                     }
@@ -96,6 +98,7 @@ export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOpt
             });
         })
         .catch((error) => {
+            // eslint-disable-next-line no-console
             console.log(error);
         });
 };

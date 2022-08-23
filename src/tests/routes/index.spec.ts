@@ -9,4 +9,9 @@ describe("Check app home page", () => {
         expect(response.type).toBe("text/html");
         expect(response.status).toBe(200);
     });
+    it("should load default not found route", async (): Promise<void> => {
+        const response: supertest.Response = await request.get("/foooooooo");
+        expect(response.type).toBe("text/html");
+        expect(response.status).toBe(404);
+    });
 });

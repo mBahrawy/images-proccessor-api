@@ -29,8 +29,8 @@ const uploadingImageMiddleware = (req: Request, res: Response, next: NextFunctio
             next();
             return;
         }
+        // eslint-disable-next-line no-console
         console.log(err);
-
 
         if (err?.code === "LIMIT_UNEXPECTED_FILE") {
             res.status(400);
