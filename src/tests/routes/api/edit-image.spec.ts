@@ -3,7 +3,7 @@ import app from "../../../server";
 import path from "path";
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
-const testImagepath = path.resolve(__basedir, "../testing-image.png");
+const testImagepath = path.resolve(__basedir, "../local-image.png");
 
 describe("Edit uploaded image", () => {
     it("should edit image", async (): Promise<void> => {

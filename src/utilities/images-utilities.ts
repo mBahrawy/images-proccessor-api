@@ -1,3 +1,4 @@
+import { Extension } from './../interfaces/Image';
 import sharp from "sharp";
 import * as fs from "fs";
 import { PlaceholderImage } from "../interfaces/PlaceholderImage";
@@ -22,13 +23,21 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
     };
 };
 
-export const generateIditImageInfo = ({ body, file }: Request): Image => {
+export const generateEditImageInfo = ({ body, file }: Request): Image => {
     const originalFilename = file?.originalname as string;
     const originalExtention = path.extname(originalFilename).replaceAll(".", "") || "png";
     return {
         ...(body?.width && { width: +body.width }),
         ...(body?.height && { height: +body.height }),
         ...(body?.extension ? { extension: body.extension } : { extension: originalExtention })
+    };
+};
+export const generateEditLocalImageInfo = ({ query }: Request, filePath: string): Image => {
+    const originalExtention = (path.extname(filePath).replaceAll(".", "") || "png") as Extension;
+    return {
+        ...(query?.width && { width: +query.width }),
+        ...(query?.height && { height: +query.height }),
+        ...(query?.extension ? { extension: query.extension as Extension } : { extension: originalExtention })
     };
 };
 
@@ -82,10 +91,10 @@ export const editedImage = async (imageBuffer: Buffer, imgaeId: string, imageOpt
         .resize(imageOptions.width, imageOptions.height, {
             fit: sharp.fit.cover
         })
-        .toFormat(imageOptions.extension)
+        .toFormat(imageOptions.extension as Extension)
         .toBuffer()
         .then((imageBuffer: Buffer) => {
-            const imagePath = createEditedImagePath("image", imgaeId, imageOptions.extension);
+            const imagePath = createEditedImagePath("image", imgaeId, imageOptions.extension as Extension);
             return new Promise<string | void>((resolve, reject) => {
                 fs.writeFile(imagePath, imageBuffer, function (err) {
                     if (err) {

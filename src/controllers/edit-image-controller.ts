@@ -1,13 +1,13 @@
 import path from "path";
 import { Request, Response } from "express";
 import { Image } from "../interfaces/Image";
-import { editedImage, generateIditImageInfo, isImageExsists } from "../utilities/images-utilities";
+import { editedImage, generateEditImageInfo, isImageExsists } from "../utilities/images-utilities";
 import { genUniqueId } from "../utilities/string-utlities";
 import { getPublicAssetUrl } from "../utilities/path-utilities";
 
 const editImageController = (req: Request, res: Response) => {
     if (!req.file) return;
-    const editOptions: Image = generateIditImageInfo(req);
+    const editOptions: Image = generateEditImageInfo(req);
     const originalname = req.file.originalname as string;
     const imageExtension = (req.body.extension as string) || path.extname(originalname).replaceAll(".", "") || "png";
     const imgaeId = genUniqueId();

@@ -31,6 +31,12 @@ const editedImagesFolder = `${process.env.NODE_ENV === "development" ? "src" : "
 // Require static assets from public folder
 app.use("/public", express.static(path.join(__dirname, "./public")));
 
+// for parsing application/json
+app.use(express.json());
+
+// for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+
 // CORS
 app.use(
     cors({

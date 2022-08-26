@@ -1,4 +1,5 @@
 declare global {
-    var __basedir : string;
+    // eslint-disable-next-line no-var
+    var __basedir: string;
 }
 export {};

@@ -31,7 +31,7 @@ A frontend screen will be created soon to create a placeholder image thought an 
 Also please note that a caching process happen, if image was already created previously with same properties, It will be loaded instead of creating new one.
 
 
-### 2. For edit an existing image, go to route `/edit`
+### 2. For edit a new image, go to route `/edit`
 **You must send an image to this request body (field name is "image"), and the file it must be an image format.**
 
 To edit an image, send formData with any of the following argument, none of them is required but they will be validated if exists.
@@ -48,13 +48,31 @@ body : {
 If you need more help, see network respond error feedback, these will all the needed validation 
 Or you can use the frontend app for easier using and better visualized errors validation.
 
+
+### 3. For edit an existing local image on server, go to route `/edit-local`
+**Please be sure that image exsists in project directory, I've added `local-image.png` as a placeholder you can replace it**
+
+To edit a local image, send a `get` request with `query paramters` of the following arguments, none of them is required but they will be validated if exists.
+
+```
+
+  image= [image file, required, must be an image format]
+  width= [number, not required]
+  height= [number, not required]
+  extension= ["png" | "jpg" | "gif" | "webp" | "jpeg", not required]
+  ... more options will be added soon
+
+```
+If you need more help, see network respond error feedback, these will all the needed validation 
+
+
 ## Using .env files
 There are 2 .env files, they are: `.env.development` and `.env.production`.
   1. `.env.development` is used for devlopment version of api, It can be used by command `npm start`
       It contains:
       ```
       NODE_ENV=development --> Mode flag
-      APP_BACKEND_URL=http://localhost --> Backend url for development
+      APP_BACKEND_BASE=localhost --> Backend url for development
       APP_BACKEND_PORT=4000 --> Development port
       ```
 
@@ -62,7 +80,7 @@ There are 2 .env files, they are: `.env.development` and `.env.production`.
       It contains:
       ```
       NODE_ENV=production --> Mode flag
-      APP_BACKEND_URL=http://localhost --> Backend url for production
+      APP_BACKEND_BASE=localhost --> Backend url for production
       APP_BACKEND_PORT=5000 --> Development port
       ```
       
