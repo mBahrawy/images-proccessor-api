@@ -25,7 +25,7 @@ export const generateImageInfo = ({ query }: Request): PlaceholderImage => {
 
 export const generateEditImageInfo = ({ body, file }: Request): Image => {
     const originalFilename = file?.originalname as string;
-    const originalExtention = path.extname(originalFilename).replaceAll(".", "") || "png";
+    const originalExtention = path.extname(originalFilename).replace(".", "") || "png";
     return {
         ...(body?.width && { width: +body.width }),
         ...(body?.height && { height: +body.height }),
@@ -33,7 +33,7 @@ export const generateEditImageInfo = ({ body, file }: Request): Image => {
     };
 };
 export const generateEditLocalImageInfo = ({ query }: Request, filePath: string): Image => {
-    const originalExtention = (path.extname(filePath).replaceAll(".", "") || "png") as Extension;
+    const originalExtention = (path.extname(filePath).replace(".", "") || "png") as Extension;
     return {
         ...(query?.width && { width: +query.width }),
         ...(query?.height && { height: +query.height }),

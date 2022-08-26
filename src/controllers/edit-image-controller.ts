@@ -9,7 +9,7 @@ const editImageController = (req: Request, res: Response) => {
     if (!req.file) return;
     const editOptions: Image = generateEditImageInfo(req);
     const originalname = req.file.originalname as string;
-    const imageExtension = (req.body.extension as string) || path.extname(originalname).replaceAll(".", "") || "png";
+    const imageExtension = (req.body.extension as string) || path.extname(originalname).replace(".", "") || "png";
     const imgaeId = genUniqueId();
 
     editedImage(req.file.buffer, imgaeId, editOptions).then((resultedImagePath): void => {

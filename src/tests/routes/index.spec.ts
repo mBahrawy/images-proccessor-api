@@ -3,7 +3,7 @@ import app from "../../server";
 
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
-fdescribe("Check app home page", () => {
+describe("Check app home page", () => {
     it("should api load home route", async (): Promise<void> => {
         const response: supertest.Response = await request.get("/");
         expect(response.type).toBe("text/html");
